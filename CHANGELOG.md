@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- Tray menu now shows a "Now Playing:" (or "Paused:") header with the song and
+  the artist and album below it. The progress row is gone, because it could not
+  update while the menu was open.
+
 ## 1.0.1
 
 - Fixed the album showing twice on the Discord card in "Artist - Song" mode.

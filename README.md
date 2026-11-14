@@ -3,7 +3,7 @@
 A small Windows tray app that shows what you're playing in Apple Music as your
 Discord status ("Listening to Apple Music"), with song, artist, album art and a
 progress bar. The tray menu doubles as a mini readout: current song, artist and
-album, progress, length and time left.
+album.
 
 ## Setup
 
@@ -22,7 +22,8 @@ Discord's *Settings > Activity Privacy > Share my activity* turned on.
 
 - **Apple Music** - green dot and "connected" while Apple Music has a song loaded,
   grey dot and "not connected" otherwise. Click it to open Apple Music.
-- **Song rows** - song, artist and album, and `progress / length (-time left)`.
+- **Now Playing** - the song, with the artist and album below it. The header
+  reads "Paused:" while playback is paused.
 - **Start / Stop** - turn the Discord status on or off (icon is red / gray).
 - **Show under my name** - the text Discord puts beneath your name:
   Artist, Song, Artist - Song, or Apple Music.

@@ -1,6 +1,6 @@
 [package]
 name = "apple-music-rpc"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 description = "Shows what Apple Music is playing as your Discord status (Windows tray app)"
 

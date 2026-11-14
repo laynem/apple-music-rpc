@@ -311,7 +311,7 @@ fn main() {
     // Mini player readout (rows 1-3, only present while Apple Music is open).
     let mi_title = MenuItem::new("", true, None);
     let mi_by = MenuItem::new("", true, None);
-    let mi_time = MenuItem::new("", true, None);
+    let mi_header = MenuItem::new("Now Playing:", false, None);
     let mi_discord = MenuItem::new("Discord: starting...", false, None);
     let mi_start = MenuItem::new("Start", false, None);
     let mi_stop = MenuItem::new("Stop", true, None);
@@ -393,6 +393,7 @@ fn main() {
     let mut shown_discord = String::new();
     let mut shown_on: Option<bool> = None;
     let mut details_visible = false;
+    let mut shown_playing: Option<bool> = None;
 
     platform::run_loop(|| {
         while let Ok(ev) = MenuEvent::receiver().try_recv() {
@@ -477,24 +478,29 @@ fn main() {
             let open = lines.1.is_some();
             if open != details_visible {
                 if open {
-                    let _ = menu.insert_items(&[&mi_title, &mi_by, &mi_time], 1);
+                    let _ = menu.insert_items(&[&mi_header, &mi_title, &mi_by], 1);
                 } else {
                     let _ = menu.remove(&mi_title);
                     let _ = menu.remove(&mi_by);
-                    let _ = menu.remove(&mi_time);
+                    let _ = menu.remove(&mi_header);
                 }
                 mi_music.set_text(if open { MUSIC_ON } else { MUSIC_OFF });
                 mi_music.set_icon(Some(if open { dot_on.clone() } else { dot_off.clone() }));
                 details_visible = open;
             }
-            if let (Some(by), Some(time)) = (&lines.1, &lines.2) {
+            if let Some(by) = &lines.1 {
                 if lines.0 != shown.0 {
                     mi_title.set_text(menu_text(&lines.0));
                 }
                 if lines.1 != shown.1 {
                     mi_by.set_text(menu_text(by));
                 }
-                mi_time.set_text(menu_text(time));
+                // No progress row: a native menu can't tick while it is open.
+                let playing = view.as_ref().map(|v| v.playing);
+                if playing != shown_playing {
+                    mi_header.set_text(if playing == Some(false) { "Paused:" } else { "Now Playing:" });
+                    shown_playing = playing;
+                }
             }
             // Hover text: "Song - Artist" plus the clock part of the progress line.
             let tip = match &view {
