@@ -1,0 +1,30 @@
+[package]
+name = "apple-music-rpc"
+version = "1.0.0"
+edition = "2021"
+description = "Shows what Apple Music is playing as your Discord status (Windows tray app)"
+
+[dependencies]
+serde_json = "1"
+tray-icon = "0.21"
+ureq = { version = "2", default-features = false, features = ["native-tls"] }
+native-tls = "0.2"
+arboard = { version = "3", default-features = false }
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+windows = { version = "0.61", features = [
+    "Foundation",
+    "Foundation_Collections",
+    "Media_Control",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_SystemInformation",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+panic = "abort"
