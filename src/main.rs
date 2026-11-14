@@ -126,6 +126,13 @@ fn open_url(url: &str) {
     let _ = std::process::Command::new("rundll32").args(["url.dll,FileProtocolHandler", url]).spawn();
 }
 
+/// Starts the Apple Music app, or brings it to the front when it is already open.
+fn open_apple_music() {
+    let _ = std::process::Command::new("explorer.exe")
+        .arg(r"shell:AppsFolder\AppleInc.AppleMusicWin_nzyj5cx40ttqa!App")
+        .spawn();
+}
+
 fn first_run_setup() -> Option<String> {
     open_url(PORTAL);
     let mut prompt = String::from(
@@ -295,10 +302,12 @@ fn main() {
     let icon_on = make_icon((250, 45, 72));
     let icon_off = make_icon((120, 120, 120));
 
-    // Row 0: whether Apple Music is open, with a status light.
+    // Row 0: whether Apple Music is open, with a status light. Clicking it opens Apple Music.
+    const MUSIC_ON: &str = "Apple Music: connected";
+    const MUSIC_OFF: &str = "Apple Music: not connected (click to open)";
     let dot_on = make_dot((52, 199, 89));
     let dot_off = make_dot((140, 140, 140));
-    let mi_music = IconMenuItem::new("Apple Music: not connected", false, Some(dot_off.clone()), None);
+    let mi_music = IconMenuItem::new(MUSIC_OFF, true, Some(dot_off.clone()), None);
     // Mini player readout (rows 1-3, only present while Apple Music is open).
     let mi_title = MenuItem::new("", true, None);
     let mi_by = MenuItem::new("", true, None);
@@ -399,6 +408,8 @@ fn main() {
                     let _ = std::fs::write(&log_path, "");
                 }
                 let _ = std::process::Command::new("notepad.exe").arg(&log_path).spawn();
+            } else if ev.id == *mi_music.id() {
+                open_apple_music();
             } else if ev.id == *mi_home.id() {
                 open_url(update::HOME_URL);
             } else if ev.id == *mi_changes.id() {
@@ -472,8 +483,7 @@ fn main() {
                     let _ = menu.remove(&mi_by);
                     let _ = menu.remove(&mi_time);
                 }
-                mi_music.set_text(if open { "Apple Music: connected" } else { "Apple Music: not connected" });
-                mi_music.set_enabled(open);
+                mi_music.set_text(if open { MUSIC_ON } else { MUSIC_OFF });
                 mi_music.set_icon(Some(if open { dot_on.clone() } else { dot_off.clone() }));
                 details_visible = open;
             }

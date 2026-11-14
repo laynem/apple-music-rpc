@@ -21,7 +21,7 @@ Discord's *Settings > Activity Privacy > Share my activity* turned on.
 ## Tray menu
 
 - **Apple Music** - green dot and "connected" while Apple Music has a song loaded,
-  greyed out and "not connected" otherwise.
+  grey dot and "not connected" otherwise. Click it to open Apple Music.
 - **Song rows** - song, artist and album, and `progress / length (-time left)`.
 - **Start / Stop** - turn the Discord status on or off (icon is red / gray).
 - **Show under my name** - the text Discord puts beneath your name:

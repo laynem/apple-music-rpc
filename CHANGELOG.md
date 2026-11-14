@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Fixed the album showing twice on the Discord card in "Artist - Song" mode.
+- Clicking the Apple Music row in the tray menu opens Apple Music, or brings it
+  to the front when it is already running.
+
 ## 1.0.0
 
 First public release.

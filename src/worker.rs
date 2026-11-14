@@ -74,7 +74,8 @@ pub fn build_activity(
     }
     if let Some(art) = &meta.art {
         a["assets"] = json!({ "large_image": art });
-        if !np.album.is_empty() {
+        // Discord prints large_text as its own line; in "both" mode the album is already in `state`.
+        if !np.album.is_empty() && mode != MODE_BOTH {
             a["assets"]["large_text"] = json!(fit(&np.album));
         }
     }
