@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- No setup needed: the app now comes with a Discord application built in, so it
+  works as soon as you run it. To use your own, put its Application ID in
+  `config.json` as `clientId`.
+
 ## 1.0.2
 
 - Tray menu now shows a "Now Playing:" (or "Paused:") header with the song and

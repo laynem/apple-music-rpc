@@ -20,7 +20,9 @@ use tray_icon::menu::{CheckMenuItem, Icon as MenuIcon, IconMenuItem, Menu, MenuE
 use tray_icon::{Icon, TrayIconBuilder};
 
 const APP_NAME: &str = "Apple Music RPC";
-const PORTAL: &str = "https://discord.com/developers/applications";
+/// The "Apple Music" Discord application every install uses unless
+/// config.json names another one with `clientId`.
+const DEFAULT_CLIENT_ID: &str = "1570956537449549894";
 
 pub const MODE_APP: u8 = 0;
 pub const MODE_ARTIST: u8 = 1;
@@ -80,7 +82,8 @@ pub fn log(msg: &str) {
 
 // ---------- config ----------
 struct Config {
-    client_id: String,
+    /// Optional override of `DEFAULT_CLIENT_ID`.
+    client_id: Option<String>,
     storefront: String,
     show_button: bool,
     status_line: String,
@@ -94,13 +97,11 @@ fn load_config(path: &Path) -> Option<Config> {
     let text = std::fs::read_to_string(path).ok()?;
     let v: Value = serde_json::from_str(text.trim_start_matches('\u{feff}')).ok()?;
     let client_id = match &v["clientId"] {
-        Value::String(s) => s.trim().to_string(),
-        Value::Number(n) => n.to_string(),
-        _ => return None,
-    };
-    if !valid_id(&client_id) {
-        return None;
+        Value::String(s) => Some(s.trim().to_string()),
+        Value::Number(n) => Some(n.to_string()),
+        _ => None,
     }
+    .filter(|id| valid_id(id));
     let status_line = v["statusLine"].as_str().unwrap_or("artist").to_string();
     Some(Config {
         client_id,
@@ -111,12 +112,14 @@ fn load_config(path: &Path) -> Option<Config> {
 }
 
 fn save_config(path: &Path, c: &Config) {
-    let v = json!({
-        "clientId": c.client_id,
+    let mut v = json!({
         "storefront": c.storefront,
         "showButton": c.show_button,
         "statusLine": c.status_line,
     });
+    if let Some(id) = &c.client_id {
+        v["clientId"] = json!(id);
+    }
     if let Ok(text) = serde_json::to_string_pretty(&v) {
         let _ = std::fs::write(path, text);
     }
@@ -131,30 +134,6 @@ fn open_apple_music() {
     let _ = std::process::Command::new("explorer.exe")
         .arg(r"shell:AppsFolder\AppleInc.AppleMusicWin_nzyj5cx40ttqa!App")
         .spawn();
-}
-
-fn first_run_setup() -> Option<String> {
-    open_url(PORTAL);
-    let mut prompt = String::from(
-        "First-time setup\n\n\
-         1. In the Discord Developer Portal (opening in your browser), click New Application and name it \"Apple Music\".\n\
-         2. Copy its Application ID from the General Information page.\n\
-         3. Click OK here - the ID is read from your clipboard.",
-    );
-    loop {
-        if !platform::confirm(APP_NAME, &prompt) {
-            return None;
-        }
-        let clip = arboard::Clipboard::new().and_then(|mut c| c.get_text()).unwrap_or_default();
-        let id = clip.trim().to_string();
-        if valid_id(&id) {
-            return Some(id);
-        }
-        prompt = String::from(
-            "The clipboard doesn't hold an Application ID (a 17-20 digit number).\n\n\
-             Copy the Application ID from the Developer Portal, then click OK to try again.",
-        );
-    }
 }
 
 // ---------- start with Windows ----------
@@ -270,8 +249,8 @@ fn main() {
     let mut config = match load_config(&config_path) {
         Some(c) => c,
         None => {
-            let Some(client_id) = first_run_setup() else { return };
-            let c = Config { client_id, storefront: "us".into(), show_button: true, status_line: "artist".into() };
+            // First run: nothing to set up.
+            let c = Config { client_id: None, storefront: "us".into(), show_button: true, status_line: "artist".into() };
             save_config(&config_path, &c);
             autostart::set(true); // on by default; untick in the tray menu
             c
@@ -289,7 +268,7 @@ fn main() {
         discord: AtomicBool::new(false),
         mode: AtomicU8::new(mode),
         view: Mutex::new(None),
-        client_id: config.client_id.clone(),
+        client_id: config.client_id.clone().unwrap_or_else(|| DEFAULT_CLIENT_ID.to_string()),
         storefront: config.storefront.clone(),
         show_button: config.show_button,
     });

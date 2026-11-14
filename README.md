@@ -7,13 +7,9 @@ album.
 
 ## Setup
 
-1. In the [Discord Developer Portal](https://discord.com/developers/applications)
-   create a **New Application** named `Apple Music` and copy its **Application ID**.
-2. Download `apple-music-rpc.exe` from the
-   [Releases](https://github.com/laynem/apple-music-rpc/releases/latest) page, put it in a folder
-   you'll keep, and run it.
-3. With the ID on your clipboard, click OK in the setup prompt. (If a
-   `config.json` from the earlier script version sits next to the exe, setup is skipped.)
+Download `apple-music-rpc.exe` from the
+[Releases](https://github.com/laynem/apple-music-rpc/releases/latest) page, put it in a
+folder you'll keep, and run it. That's it; it appears in the system tray.
 
 Needs the Apple Music app for Windows (or iTunes), the Discord desktop app, and
 Discord's *Settings > Activity Privacy > Share my activity* turned on.
@@ -34,9 +30,14 @@ Discord's *Settings > Activity Privacy > Share my activity* turned on.
 
 ## config.json
 
-Created next to the exe: `clientId`, `storefront` (two-letter country used for
+Created next to the exe: `storefront` (two-letter country used for
 album art lookups, default `us`), `showButton` (the "Play on Apple Music" button),
 `statusLine` (`artist`, `song`, `both`, `app`).
+
+Optional: `clientId`, the Application ID of your own Discord application (create
+one named `Apple Music` in the
+[Discord Developer Portal](https://discord.com/developers/applications)). Without
+it the app uses its built-in one.
 
 ## Build
 
